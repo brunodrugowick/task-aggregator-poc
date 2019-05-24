@@ -1,5 +1,7 @@
 package dev.drugowick.taskaggregatorpoc.controllers.rest_controllers;
 
+import dev.drugowick.taskaggregatorpoc.domain.QueueItem;
+import dev.drugowick.taskaggregatorpoc.services.QueueItemService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.MediaType;
@@ -7,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,10 +18,18 @@ public class RestApiController {
 
     @Data
     @AllArgsConstructor
-    private class ExampleResponseClass {
-        private int integer;
-        private String text;
-        private Long longNumber;
+    private class TasksResponseClass {
+        private String name;
+        private String link;
+    }
+
+    @Data
+    @AllArgsConstructor
+    private class QueueItemResponseClass {
+        private String name;
+        private String description;
+        private String date;
+        private String time;
     }
 
     @RequestMapping(value = "/rest/hello", method = RequestMethod.GET)
@@ -27,14 +38,34 @@ public class RestApiController {
         return responseToBeParsedToJson;
     }
 
-    @RequestMapping(value = "/rest/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Set<ExampleResponseClass> listOfItems() {
-        Set<ExampleResponseClass> listOfItems = new HashSet<>();
-        for (int i = 1; i <= 10; i++) {
-            ExampleResponseClass exampleResponseClass = new ExampleResponseClass(i, "Iteration " + i, Integer.toUnsignedLong(i));
-            listOfItems.add(exampleResponseClass);
-        }
-        return listOfItems;
+    @RequestMapping(value = "/rest/tasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Set<TasksResponseClass> listOfItems() {
+        Set<TasksResponseClass> listOfTasks = new HashSet<>();
+        listOfTasks.add(
+                new TasksResponseClass("Queue Anything", "/queue-page")
+        );
+        return listOfTasks;
+    }
+
+    private final QueueItemService queueItemService;
+
+    public RestApiController(QueueItemService queueItemService) {
+        this.queueItemService = queueItemService;
+    }
+
+    @RequestMapping(value = "/rest/queue", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Set<QueueItemResponseClass> getQueueItems() {
+        Iterable<QueueItem> queueItems = queueItemService.getQueueItems();
+        Set<QueueItemResponseClass> queueItemsResponseSet = new HashSet<>();
+        queueItems.forEach(queueItem -> queueItemsResponseSet.add(
+                new QueueItemResponseClass(
+                        queueItem.getName(),
+                        queueItem.getDescription(),
+                        queueItem.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                        queueItem.getCreatedAt().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+                )
+        ));
+        return queueItemsResponseSet;
     }
 
 }

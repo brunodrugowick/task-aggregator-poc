@@ -19,22 +19,21 @@
   <body>
     <div th:replace="fragments/top-navbar :: top-navbar"></div>
 
-    <div id="vue-example" class="container">
-        <p class="h2">{{ message }}</p>
+    <p/>
+
+    <div id="vue-listOfTasks" class="container" v-if="listOfTasks != null">
         <table class="table table-striped">
             <thead class="thead-dark">
-                <tr>
-                    <th>Integer</th>
-                    <th>Text</th>
-                    <th>Long</th>
-                </tr>
+            <tr>
+                <th>Task Name</th>
+                <th>Link</th>
+            </tr>
             </thead>
             <tbody>
-                <tr v-for="item in listOfItems">
-                    <td>{{ item.integer }}</td>
-                    <td>{{ item.text }}</td>
-                    <td>{{ item.longNumber}}</td>
-                </tr>
+            <tr v-for="item in listOfTasks">
+                <td>{{ item.name }}</td>
+                <td><a v-bind:href="item.link">{{ item.link }}</a></td>
+            </tr>
             </tbody>
         </table>
     </div>
@@ -42,17 +41,16 @@
     <!-- Actual Vue.js script -->
     <script>
         var app = new Vue({
-            el: '#vue-example',
+            el: '#vue-listOfTasks',
             data() {
                 return {
-                    listOfItems: null,
-                    message: 'I got this data from the server with Axios in Vue.js'
+                    listOfTasks: null
                 }
             },
             mounted(){
                 axios
-                    .get("/rest/list")
-                    .then(response => (this.listOfItems = response.data))
+                    .get("/rest/tasks")
+                    .then(response => (this.listOfTasks = response.data))
             },
         })
     </script>    
