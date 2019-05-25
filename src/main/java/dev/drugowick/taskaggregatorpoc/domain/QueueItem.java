@@ -3,6 +3,7 @@ package dev.drugowick.taskaggregatorpoc.domain;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,7 +17,10 @@ public class QueueItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private String name;
+
+    @NotNull
     private String description;
     private LocalDateTime createdAt;
 
