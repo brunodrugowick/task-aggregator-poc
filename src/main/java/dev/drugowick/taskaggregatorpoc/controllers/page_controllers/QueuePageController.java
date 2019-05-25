@@ -5,6 +5,7 @@ import dev.drugowick.taskaggregatorpoc.services.QueueItemService;
 import lombok.Data;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,5 +43,11 @@ public class QueuePageController {
         queueItemService.saveQueueItem(queueItem);
 
         return "redirect:/queue-page";
+    }
+
+    @ExceptionHandler(Exception.class)
+    public String handleException(Model model, Exception exception) {
+        model.addAttribute("exceptionMessage", exception.getMessage());
+        return "error";
     }
 }
